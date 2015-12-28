@@ -4,6 +4,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var fileUpload = require('express-fileupload')
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
@@ -21,6 +22,26 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(fileUpload());
+
+app.post('/upload',function(req,res){
+  var sampleFile;
+
+	if (!req.files) {
+		res.send('No image were uploaded.');
+		return;
+	}
+
+	sampleFile = req.files.sampleFile;
+	sampleFile.mv('/upload/photos', function(err) {
+		if (err) {
+			res.status(500).send(err);
+		}
+		else {
+			res.send('File uploaded!');
+		}
+	});
+})
 
 app.use('/', routes);
 app.use('/users', users);
